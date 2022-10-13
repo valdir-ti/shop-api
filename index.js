@@ -16,9 +16,11 @@ mongoose
   });
 
 app.use(express.json());
+
 app.get("/api/v1", (_, res) => {
   res.send("API is working");
 });
+
 app.use("/api/v1/users", Routes.userRoutes);
 app.use("/api/v1/products", Routes.productRoutes);
 app.use("/api/v1/orders", Routes.orderRoutes);
