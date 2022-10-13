@@ -24,6 +24,8 @@ app.get("/api/v1", (_, res) => {
 app.use("/api/v1/users", Routes.userRoutes);
 app.use("/api/v1/products", Routes.productRoutes);
 app.use("/api/v1/orders", Routes.orderRoutes);
+app.use("/api/v1/cart", Routes.cartRoutes);
+app.use("/api/v1/auth", Routes.authRoutes);
 
 app.listen(process.env.PORT, () => {
   console.log(`App listening on port ${process.env.PORT}`);
