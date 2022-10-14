@@ -4,8 +4,14 @@ const User = require("../models/User");
 
 const { verifyTokenAndAuthorization } = require("../middlewares/verifyToken");
 
-router.get("/", (req, res) => {
-  res.send("List all users");
+router.get("/", async (req, res) => {
+  try {
+    const users = await User.find();
+
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(403).json({ message: "You are not alowed to do that" });
+  }
 });
 
 router.get("/:id", (req, res) => {
