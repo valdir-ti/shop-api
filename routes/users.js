@@ -20,8 +20,9 @@ router.get("/", async (req, res) => {
 router.get("/:id", verifyTokenAndAuthorization, async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
+    const { _id, username, email, isAdmin } = user;
 
-    res.status(200).json(user);
+    res.status(200).json({ _id, username, email, isAdmin });
   } catch (error) {
     res.status(403).json({ message: "You are not alowed to do that" });
   }
