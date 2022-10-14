@@ -2,7 +2,10 @@ const router = require("express").Router();
 const CryptoJS = require("crypto-js");
 const User = require("../models/User");
 
-const { verifyTokenAndAuthorization } = require("../middlewares/verifyToken");
+const {
+  verifyTokenAndAuthorization,
+  verifyTokenAndAdmin,
+} = require("../middlewares/verifyToken");
 
 router.get("/", async (req, res) => {
   try {
@@ -14,8 +17,14 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/:id", (req, res) => {
-  res.send(`List an user: ${req.params.id}`);
+router.get("/:id", verifyTokenAndAuthorization, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(403).json({ message: "You are not alowed to do that" });
+  }
 });
 
 router.post("/", (req, res) => {
@@ -44,8 +53,15 @@ router.put("/:id", verifyTokenAndAuthorization, async (req, res) => {
   }
 });
 
-router.delete("/:id", (req, res) => {
-  res.send(`Delete the user: ${req.params.id}`);
+router.delete("/:id", verifyTokenAndAdmin, async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    res
+      .status(200)
+      .json({ message: `User has been deleted: ${req.params.id}` });
+  } catch (error) {
+    res.status(403).json({ message: "You are not alowed to do that" });
+  }
 });
 
 module.exports = router;
