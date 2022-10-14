@@ -5,31 +5,51 @@ const User = require("../models/User");
 const {
   verifyTokenAndAuthorization,
   verifyTokenAndAdmin,
+  verifyToken,
 } = require("../middlewares/verifyToken");
 
 router.get("/", async (req, res) => {
   try {
-    const users = await User.find();
+    const users = await User.find({ isActive: true });
 
     res.status(200).json(users);
   } catch (error) {
-    res.status(403).json({ message: "You are not alowed to do that" });
+    res.status(403).json({ message: error.message });
   }
 });
 
-router.get("/:id", verifyTokenAndAuthorization, async (req, res) => {
+router.get("/:id", verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
-    const { _id, username, email, isAdmin } = user;
-
-    res.status(200).json({ _id, username, email, isAdmin });
+    if (user) {
+      const { _id, username, email, isAdmin, isActive, cpf } = user;
+      res.status(200).json({ _id, username, email, isAdmin, isActive, cpf });
+    } else {
+      res.status(403).json({ messsage: "User not found" });
+    }
   } catch (error) {
-    res.status(403).json({ message: "You are not alowed to do that" });
+    res.status(403).json({ message: error.message });
   }
 });
 
-router.post("/", (req, res) => {
-  res.send(`Add an new user: ${req.params}`);
+router.post("/", verifyToken, async (req, res) => {
+  const newUser = new User({
+    cpf: req.body.cpf,
+    name: req.body.name,
+    username: req.body.username,
+    email: req.body.email,
+    password: CryptoJS.AES.encrypt(
+      req.body.password,
+      process.env.SECRET_KEY
+    ).toString(),
+  });
+
+  try {
+    const savedUser = await newUser.save();
+    res.status(201).json(savedUser);
+  } catch (error) {
+    res.status(403).json({ message: error.message });
+  }
 });
 
 router.put("/:id", verifyTokenAndAuthorization, async (req, res) => {
@@ -50,7 +70,7 @@ router.put("/:id", verifyTokenAndAuthorization, async (req, res) => {
     );
     res.status(200).json(updateUser);
   } catch (error) {
-    res.status(403).json({ message: "You are not alowed to do that" });
+    res.status(403).json({ message: error.message });
   }
 });
 
@@ -61,7 +81,7 @@ router.delete("/:id", verifyTokenAndAdmin, async (req, res) => {
       .status(200)
       .json({ message: `User has been deleted: ${req.params.id}` });
   } catch (error) {
-    res.status(403).json({ message: "You are not alowed to do that" });
+    res.status(403).json({ message: error.message });
   }
 });
 
