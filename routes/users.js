@@ -8,7 +8,7 @@ const {
   verifyToken,
 } = require("../middlewares/verifyToken");
 
-router.get("/", async (req, res) => {
+router.get("/", verifyToken, async (req, res) => {
   try {
     const users = await User.find({ isActive: true });
 

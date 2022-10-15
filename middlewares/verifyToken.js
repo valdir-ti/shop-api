@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 
+//Only Token
 const verifyToken = (req, res, next) => {
   const authHeader = req.headers.token;
 
@@ -15,6 +16,7 @@ const verifyToken = (req, res, next) => {
   }
 };
 
+//With Token and Authorized
 const verifyTokenAndAuthorization = (req, res, next) => {
   verifyToken(req, res, () => {
     if (req.user.id === req.params.id || req.user.isAdmin) {
@@ -25,6 +27,7 @@ const verifyTokenAndAuthorization = (req, res, next) => {
   });
 };
 
+//Only Admin
 const verifyTokenAndAdmin = (req, res, next) => {
   verifyToken(req, res, () => {
     if (req.user.isAdmin) {
